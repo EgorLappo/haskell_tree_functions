@@ -1,11 +1,10 @@
-import Data.List 
+module Tree where 
+
+import Data.List ( nub ) 
+import Control.Applicative ( Alternative((<|>)) )
+
+    
 data Tree a = Leaf a | Node a (Tree a) (Tree a) deriving Eq
-
-placeholderLabel = "x"
-
--- parse the Newick string into a Tree
-parse :: String -> Tree String
-parse = undefined
 
 -- get all leaf labels
 leafLabels :: Tree a -> [a]
@@ -20,6 +19,10 @@ nodeLabelList (Node a l r) = nodeLabelList l ++ [a] ++ nodeLabelList r
 -- predicate to check if the nodes of a tree are labeled uniquely
 isUniqueLabeled :: Eq a => Tree a -> Bool
 isUniqueLabeled t = l == nub l where l =  nodeLabelList t
+
+treeSize :: Tree a -> Int
+treeSize (Leaf _) = 1
+treeSize (Node _ l r) = 1 + treeSize l + treeSize r
 
 -- ** ALL OPERATIONS BELOW ARE FOR UNIQUELY LABELED TREES ** 
 -- ** ALL OPERATIONS ASSUME THAT GIVEN LABELS DO EXISt IN THE TREE ** 
@@ -44,14 +47,37 @@ mrcaNode' ls t@(Node a l r) = if isListSubset ls $ nodeLabelList t   -- if the l
                                         -- last option (True, True) is not possible as leaf sets of subtrees are guaranteed to be disjoint
                               else Nothing
 
-
 -- get labels of all ancestors of a given node
 ancestorNodes :: Eq a => a -> Tree a -> [a]
-ancestorNodes = undefined
+ancestorNodes a t
+    | not $ isUniqueLabeled t = error "the tree is not labeled uniquely!"
+    | otherwise = case ancestorNodes' a t of 
+        Just ls -> ls
+        Nothing -> error "leaf label is not present in the tree!"
+
+ancestorNodes' :: Eq a => a -> Tree a -> Maybe [a]
+ancestorNodes' a (Leaf b) = if a == b then Just [] -- found it! start building a list
+                                      else Nothing -- dead end
+ancestorNodes' a (Node b l r) =
+    if a == b then Just [] -- found it! start building a list, or...
+              else ((:) b) <$> (ancestorNodes' a l <|> ancestorNodes' a r) -- look recursively (cf. Alternative typeclass)
+
 
 -- get a subtree induced by a node with a given label
 nodeSubtree :: Eq a => a -> Tree a -> Tree a
-nodeSubtree = undefined
+nodeSubtree a t
+    | not $ isUniqueLabeled t = error "the tree is not labeled uniquely!"
+    | otherwise = case nodeSubtree' a t of 
+        Just t' -> t'
+        Nothing -> error "leaf label is not present in the tree!"
+
+nodeSubtree' :: Eq a => a -> Tree a -> Maybe (Tree a)
+nodeSubtree' a (Leaf b) = if a == b then Just (Leaf b) else Nothing
+nodeSubtree' a t@(Node b l r) = if a == b then Just t else nodeSubtree' a l <|> nodeSubtree' a r 
+
+-- ** COMPUTE ANCESTRAL CONFIGURATIONS ** 
+
+
 
 
 -- ** HELPER FUNCTIONS **
