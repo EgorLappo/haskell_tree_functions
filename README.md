@@ -5,6 +5,10 @@ These include _coalescent histories_, _ancestral configurations_, and _labeled h
 
 The code is naive without crazy optimizations or tricks.
 
+### Usage
+
+To use this, you can run `ghci Main.hs` and experiment with various functions. Alternatively, you can import the modules ino your own projects.
+
 ### References
 
 1 - [Rosenberg, N. A. (2007). Counting coalescent histories.](https://rosenberglab.stanford.edu/papers/Rosenberg2007-JCB.pdf)
