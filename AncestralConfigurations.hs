@@ -16,7 +16,8 @@ rootConfigurations g s = filter (not . (containsAnyElemFromList antipodals)) mAC
     where mACs = matchingRootConfigurations g -- matching root ACs for G. we will filter them using the topology of S
           gNodes = nodeLabels g -- internal nodes of G, of which we select...
           antipodals = filter (isAntipodal g s) gNodes -- ...only nodes which have antipodal pairs among descendants. we need to filter out ACs with these lineages
+          isAntipodal :: Eq a => Tree a -> Tree a -> a -> Bool
+          isAntipodal g s a = label (mrcaNode s $ leafLabels $ nodeSubtree a g) == label s
+-- for the proof that this method works for all nonmatching pairs see https://arxiv.org/abs/2111.10456
 
-isAntipodal :: Eq a => Tree a -> Tree a -> a -> Bool
-isAntipodal g s a = label (mrcaNode (leafLabels $ nodeSubtree a g) s) == label s
 

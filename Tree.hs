@@ -33,6 +33,18 @@ decorateSubtreeString' :: Int -> String -> String
 decorateSubtreeString' n s = unlines $ dec $ lines s where dec (x:xs) = ("|---" ++ (take n $ repeat '-') ++ x ) : map (\ln -> "|   " ++ (take n $ repeat ' ') ++ ln) xs
 
 -- ** BASIC FUNCTIONS ** 
+
+-- return the tuple of subtrees
+subtrees :: Tree a -> Maybe (Tree a, Tree a)
+subtrees (Leaf a) = Nothing
+subtrees (Node a l r) = Just (l, r)
+
+left :: Tree a -> Maybe (Tree a)
+left t = fmap fst $ subtrees t
+
+right :: Tree a -> Maybe (Tree a)
+right t = fmap snd $ subtrees t
+
 label :: Tree a -> a
 label (Leaf a) = a
 label (Node a _ _) = a
@@ -67,8 +79,8 @@ numLeaves (Leaf _) = 1
 numLeaves (Node _ l r) = numLeaves l + numLeaves r
 
 -- get most recent common ancestor (MRCA) of a given list of leaf (labels)
-mrcaNode :: Eq a => [a] -> Tree a -> Tree a
-mrcaNode ls t 
+mrcaNode :: Eq a => Tree a -> [a] -> Tree a
+mrcaNode t ls 
     | not $ isUniqueLabeled t = error "the tree is not labeled uniquely!"
     | otherwise = case mrcaNode' ls t of 
         Just t' -> t' 
