@@ -3,8 +3,36 @@ module Tree where
 import Data.List ( nub ) 
 import Control.Applicative ( Alternative((<|>)) )
 
-    
 data Tree a = Leaf a | Node a (Tree a) (Tree a) deriving Eq
+
+-- ** PRINT in a visually digestible format ** 
+instance Show a => Show (Tree a) where 
+    show (Leaf a) = (show a)
+    show (Node a l r) = 
+        case (l,r) of (Leaf x, Leaf y) -> (stripExtraQuotes $ show a) ++ "\n"
+                                                   ++ "|---" ++ (stripExtraQuotes $ show x) ++ "\n|\n"
+                                                   ++ "|---" ++ (stripExtraQuotes $ show y) 
+                      (Node a' l' r', Leaf x) -> (stripExtraQuotes $ show a) ++ "\n" 
+                                                          ++ (decorateSubtreeString' n $ show (Node a' l' r'))
+                                                          ++ "|\n|---" ++ (stripExtraQuotes $ show x)
+                      (Leaf x, Node a' l' r') -> (stripExtraQuotes $ show a) ++ "\n"
+                                                          ++ "|---" ++ (stripExtraQuotes $ show x) ++ "\n|\n"
+                                                          ++ (decorateSubtreeString n $ show (Node a' l' r'))
+                      (Node a' l' r', Node a'' l'' r'') -> (stripExtraQuotes $ show a) ++ "\n" 
+                                                                    ++ (decorateSubtreeString' n $ show (Node a' l' r')) ++"|\n"
+                                                                    ++ (decorateSubtreeString n $ show (Node a'' l'' r''))
+        where n = length $ stripExtraQuotes $ show a
+
+stripExtraQuotes :: String -> String 
+stripExtraQuotes = filter (/= '"')
+
+decorateSubtreeString :: Int -> String -> String
+decorateSubtreeString n s = unlines $ dec $ lines s where dec (x:xs) = ("|---" ++ (take n $ repeat '-') ++ x ) : map (\ln -> "    " ++ (take n $ repeat ' ') ++ ln) xs
+
+decorateSubtreeString' :: Int -> String -> String
+decorateSubtreeString' n s = unlines $ dec $ lines s where dec (x:xs) = ("|---" ++ (take n $ repeat '-') ++ x ) : map (\ln -> "|   " ++ (take n $ repeat ' ') ++ ln) xs
+
+-- ** BASIC FUNCTIONS ** 
 
 -- get all leaf labels
 leafLabels :: Tree a -> [a]
@@ -20,12 +48,15 @@ nodeLabelList (Node a l r) = nodeLabelList l ++ [a] ++ nodeLabelList r
 isUniqueLabeled :: Eq a => Tree a -> Bool
 isUniqueLabeled t = l == nub l where l =  nodeLabelList t
 
-treeSize :: Tree a -> Int
-treeSize (Leaf _) = 1
-treeSize (Node _ l r) = 1 + treeSize l + treeSize r
+-- compute the number of nodes in the tree
+numNodes :: Tree a -> Int
+numNodes (Leaf _) = 1
+numNodes (Node _ l r) = 1 + numNodes l + numNodes r
 
--- ** ALL OPERATIONS BELOW ARE FOR UNIQUELY LABELED TREES ** 
--- ** ALL OPERATIONS ASSUME THAT GIVEN LABELS DO EXISt IN THE TREE ** 
+-- compute the number of leaves in the tree
+numLeaves :: Tree a -> Int
+numLeaves (Leaf _) = 1
+numLeaves (Node _ l r) = numLeaves l + numLeaves r
 
 -- get most recent common ancestor (MRCA) of a given list of leaf (labels)
 mrcaNode :: Eq a => [a] -> Tree a -> Tree a
@@ -74,11 +105,6 @@ nodeSubtree a t
 nodeSubtree' :: Eq a => a -> Tree a -> Maybe (Tree a)
 nodeSubtree' a (Leaf b) = if a == b then Just (Leaf b) else Nothing
 nodeSubtree' a t@(Node b l r) = if a == b then Just t else nodeSubtree' a l <|> nodeSubtree' a r 
-
--- ** COMPUTE ANCESTRAL CONFIGURATIONS ** 
-
-
-
 
 -- ** HELPER FUNCTIONS **
 isListSubset :: Eq a => [a] -> [a] -> Bool
