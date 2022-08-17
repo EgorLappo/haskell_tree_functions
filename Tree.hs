@@ -33,20 +33,28 @@ decorateSubtreeString' :: Int -> String -> String
 decorateSubtreeString' n s = unlines $ dec $ lines s where dec (x:xs) = ("|---" ++ (take n $ repeat '-') ++ x ) : map (\ln -> "|   " ++ (take n $ repeat ' ') ++ ln) xs
 
 -- ** BASIC FUNCTIONS ** 
+label :: Tree a -> a
+label (Leaf a) = a
+label (Node a _ _) = a
+
+-- get labels of all nodes in a list
+nodeLabels :: Tree a -> [a]
+nodeLabels (Leaf a) = [a]
+nodeLabels (Node a l r) = nodeLabels l ++ [a] ++ nodeLabels r
 
 -- get all leaf labels
 leafLabels :: Tree a -> [a]
 leafLabels (Leaf a) = [a]
 leafLabels (Node a l r) = leafLabels l ++ leafLabels r
 
--- get labels of all nodes in a list
-nodeLabelList :: Tree a -> [a]
-nodeLabelList (Leaf a) = [a]
-nodeLabelList (Node a l r) = nodeLabelList l ++ [a] ++ nodeLabelList r
+-- get labels of all internal nodes
+internalLabels :: Tree a -> [a]
+internalLabels (Leaf a) = []
+internalLabels (Node a l r) = internalLabels l ++ [a] ++ internalLabels r
 
 -- predicate to check if the nodes of a tree are labeled uniquely
 isUniqueLabeled :: Eq a => Tree a -> Bool
-isUniqueLabeled t = l == nub l where l =  nodeLabelList t
+isUniqueLabeled t = l == nub l where l =  nodeLabels t
 
 -- compute the number of nodes in the tree
 numNodes :: Tree a -> Int
@@ -70,8 +78,8 @@ mrcaNode ls t
 mrcaNode' :: Eq a => [a] -> Tree a -> Maybe (Tree a)
 mrcaNode' [l] (Leaf l') = if l == l' then Just (Leaf l) else Nothing -- first match on leaves, which happens only if the list has a single element
 mrcaNode' _   (Leaf y)  = Nothing                                    -- bigger lists never match
-mrcaNode' ls t@(Node a l r) = if isListSubset ls $ nodeLabelList t   -- if the labels in the list are in subtree, then we are on the right track, we only need to ensure minimality
-                              then case (isListSubset ls $ nodeLabelList l, isListSubset ls $ nodeLabelList r) of 
+mrcaNode' ls t@(Node a l r) = if isListSubset ls $ nodeLabels t   -- if the labels in the list are in subtree, then we are on the right track, we only need to ensure minimality
+                              then case (isListSubset ls $ nodeLabels l, isListSubset ls $ nodeLabels r) of 
                                         (False, False) -> Just t -- this means this node is minimal, return it; otherwise recurse
                                         (True, False) -> mrcaNode' ls l
                                         (False, True) -> mrcaNode' ls r 
@@ -107,6 +115,13 @@ nodeSubtree' a (Leaf b) = if a == b then Just (Leaf b) else Nothing
 nodeSubtree' a t@(Node b l r) = if a == b then Just t else nodeSubtree' a l <|> nodeSubtree' a r 
 
 -- ** HELPER FUNCTIONS **
+
+-- predicate to determine if xs is a subset of ys
 isListSubset :: Eq a => [a] -> [a] -> Bool
 isListSubset xs ys = all (\x -> elem x ys) xs
 
+-- predicate to determine if the second list contains any element from the first list
+containsAnyElemFromList :: Eq a => [a] -> [a] -> Bool
+containsAnyElemFromList [] _ = False 
+containsAnyElemFromList _ [] = False
+containsAnyElemFromList (x:xs) ys = if x `elem` ys then True else containsAnyElemFromList xs ys
