@@ -18,9 +18,9 @@ toTree :: ExtTree a -> Tree a
 toTree (Leaf _ a) = T.Leaf a
 toTree (Node _ a l r) = T.Node a (toTree l) (toTree r)
 
-label :: ExtTree a -> a
-label (Leaf _ a) = a
-label (Node _ a _ _) = a
+labelExt :: ExtTree a -> a
+labelExt (Leaf _ a) = a
+labelExt (Node _ a _ _) = a
 
 relabelExt :: Int -> ExtTree a -> ExtTree a
 relabelExt k (Leaf _ a) = Leaf k a 
@@ -48,5 +48,5 @@ countNonmatchingCoalescentHistories' g@(Node _ _ gl gr) s@(Node m _ _ _) = sum $
           aR = [countNonmatchingCoalescentHistories' gr (relabelExt (k + dr) tr) | k <- [1..m]]
           tl = (fromTree . T.mrcaNode (toTree s) . T.nodeLabels . toTree) gl
           tr = (fromTree . T.mrcaNode (toTree s) . T.nodeLabels . toTree) gr
-          dl = length $ T.ancestorNodes (label tl) (toTree s)
-          dr = length $ T.ancestorNodes (label tr) (toTree s)
+          dl = length $ T.ancestorNodes (labelExt tl) (toTree s)
+          dr = length $ T.ancestorNodes (labelExt tr) (toTree s)
