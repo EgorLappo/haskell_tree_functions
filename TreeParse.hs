@@ -16,8 +16,8 @@ nameInternalNodes i (x:y:xs) | x == ')' = if (y == ',') || (y == ')')
                              | otherwise = x : nameInternalNodes i (y:xs)
 
 -- parse the Newick string into a Tree
-parseNewick :: String -> Tree String
-parseNewick = fst . head . (parse tree) . (nameInternalNodes 1)
+parseString :: String -> Tree String
+parseString = fst . head . (parse tree) . (nameInternalNodes 1)
 
 -- the parser code is straight from the Hutton textbook
 -- i don't need more complicated stuff for now
