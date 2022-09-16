@@ -3,7 +3,7 @@
 I implemented some function to enumerate basic phylogenetic quantities I encounter in my work with `Haskell`. 
 These include _coalescent histories_ and _ancestral configurations_.
 
-The code is naive without crazy optimizations or tricks.
+For the sake of readability and educational value, the code is naive without any optimizations or tricks.
 
 ### Usage
 
