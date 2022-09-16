@@ -1,4 +1,4 @@
-module TreeParse where
+module TreeParse (parseString) where
 
 import Control.Applicative
 import Data.Char
