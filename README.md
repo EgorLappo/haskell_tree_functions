@@ -9,7 +9,7 @@ The code is naive without crazy optimizations or tricks.
 
 To use this, you can run `ghci Main.hs` and experiment with various functions. Alternatively, you can import the modules ino your own projects.
 
-To define a tree, you can use a standard string format, where the tree structure is defined with parentheses and nodes are labeled with alphanmeric characers. For example, you would run `matchingRootConfigurations $ parseString "(((a,b),(c,d)),e)"`. All unlabeled nodes will be labeled automatically as `x1`, `x2`, and so on.
+To define a tree, you can use the (simplified) Newick format, in which the tree structure is defined with parentheses and nodes are labeled with alphanmeric characers. For example, you would run `matchingRootConfigurations $ parseString "(((a,b),(c,d)),e)"`. All unlabeled nodes will be labeled automatically as `x1`, `x2`, and so on.
 
 ### References 
 
