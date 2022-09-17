@@ -1,23 +1,27 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-unused-do-bind #-}
+{-# LANGUAGE LambdaCase #-}
 module TreeParse (parseString) where
 
 import Control.Applicative
 import Data.Char
 import Tree
 
+placeholderLabel :: String
 placeholderLabel = "x"
 
-nameInternalNodes :: Int -> String -> String 
-nameInternalNodes i [] = []
+nameInternalNodes :: Int -> String -> String
+nameInternalNodes _ [] = []
 nameInternalNodes i [s] | s == ')' = ")" ++ placeholderLabel ++ show i
                      | otherwise = [s]
-nameInternalNodes i (x:y:xs) | x == ')' = if (y == ',') || (y == ')') 
-                                          then x:(placeholderLabel ++ show i ++ nameInternalNodes (i+1) (y:xs)) 
-                                          else (x : nameInternalNodes i (y:xs))
+nameInternalNodes i (x:y:xs) | x == ')' = if (y == ',') || (y == ')')
+                                          then x:(placeholderLabel ++ show i ++ nameInternalNodes (i+1) (y:xs))
+                                          else x : nameInternalNodes i (y:xs)
                              | otherwise = x : nameInternalNodes i (y:xs)
 
 -- parse the Newick string into a Tree
 parseString :: String -> Tree String
-parseString = fst . head . (parse tree) . (nameInternalNodes 1)
+parseString = fst . head . parse tree . nameInternalNodes 1
 
 -- the parser code is straight from the Hutton textbook
 -- i don't need more complicated stuff for now
@@ -26,35 +30,36 @@ parseString = fst . head . (parse tree) . (nameInternalNodes 1)
 newtype Parser a = P (String -> [(a, String)])
 
 parse :: Parser a -> String -> [(a, String)]
-parse (P p) inp = p inp
+parse (P p) = p
 
 -- ** type class definitions **
 instance Functor Parser where
-    fmap g (P p) = P (\inp -> case p inp of [] -> [] 
-                                            [(v, rem)] -> [(g v, rem)])
+    fmap g (P p) = P (\inp -> case p inp of [] -> []
+                                            [(v, r)] -> [(g v, r)])
 
-instance Applicative Parser where 
+instance Applicative Parser where
     pure x = P (\inp -> [(x, inp)])
     -- (<*>) :: Parser (a -> b) -> Parser a -> Parser b
-    pg <*> p = P (\inp -> 
+    pg <*> p = P (\inp ->
         case parse pg inp of [] -> []
-                             [(pf, rem)] -> parse (fmap pf p) rem)
-                                
+                             [(pf, r)] -> parse (fmap pf p) r)
+
 instance Monad Parser where
     -- (>>=) :: Parser a -> (a -> Parser b) -> Parser b
-    p >>= f = P (\inp -> 
+    p >>= f = P (\inp ->
         case parse p inp of [] -> []
-                            [(v, rem)] -> parse (f v) rem)
+                            [(v, r)] -> parse (f v) r)
 
 instance Alternative Parser where
-    empty = P (\_ -> [])
-    p <|> q = P (\inp -> 
+    empty = P (const [])
+    p <|> q = P (\inp ->
         case parse p inp of [] -> parse q inp
-                            [(v, rem)] -> [(v, rem)])
+                            [(v, r)] -> [(v, r)])
 
 item :: Parser Char
-item = P (\inp -> case inp of [] -> []
-                              (x:xs) -> [(x, xs)])
+item = P $ \case
+             [] -> []
+             (x : xs) -> [(x, xs)]
 
 sat :: (Char -> Bool) -> Parser Char
 sat f = do x <- item
@@ -81,5 +86,5 @@ tree = do char '('
           return (Node x l r)
        <|> leafLabel
 
-    
-          
+
+

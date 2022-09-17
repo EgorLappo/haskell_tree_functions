@@ -21,6 +21,8 @@ description:         Please see the README on GitHub at <https://github.com/Egor
 
 dependencies:
 - base >= 4.7 && < 5
+- array
+- unordered-containers
 
 ghc-options:
 - -Wall
@@ -32,6 +34,8 @@ ghc-options:
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints
+- -Wno-unused-top-binds
+- -Wno-unused-imports
 
 library:
   source-dirs: src
@@ -47,13 +51,3 @@ executables:
     dependencies:
     - tree-combinatorics-functions
 
-tests:
-  tree-combinatorics-functions-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - tree-combinatorics-functions
