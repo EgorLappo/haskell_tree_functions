@@ -1,3 +1,5 @@
+{- -}
+
 module AncestralConfigurations where
 
 import Tree
