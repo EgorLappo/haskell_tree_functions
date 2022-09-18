@@ -1,4 +1,6 @@
-module AncestralConfigurations (matchingRootConfigurations, rootConfigurations) where
+module AncestralConfigurations (matchingRootConfigurations, rootConfigurations, showAC) where
+
+import Data.List ( intercalate )
 
 import Tree
     ( Tree(..),
@@ -28,3 +30,5 @@ rootConfigurations g s = filter (not . containsAnyElemFromList antipodals) mACs
 -- for the proof that this method works for all nonmatching pairs see https://arxiv.org/abs/2111.10456
 
 
+showAC :: [String] -> String
+showAC ac = "{" ++ intercalate ", " ac ++ "}"

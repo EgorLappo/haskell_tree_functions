@@ -34,10 +34,21 @@ library
       Paths_tree_combinatorics_functions
   hs-source-dirs:
       src
+  default-extensions:
+      NoMonomorphismRestriction
+      FlexibleContexts
+      TypeFamilies
+      LambdaCase
+      PartialTypeSignatures
+      TemplateHaskell
+      OverloadedStrings
+      TupleSections
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-unused-top-binds -Wno-unused-imports
   build-depends:
       array
     , base >=4.7 && <5
+    , lens
+    , mtl
     , unordered-containers
   default-language: Haskell2010
 
@@ -47,10 +58,21 @@ executable tree-combinatorics-functions-exe
       Paths_tree_combinatorics_functions
   hs-source-dirs:
       app
+  default-extensions:
+      NoMonomorphismRestriction
+      FlexibleContexts
+      TypeFamilies
+      LambdaCase
+      PartialTypeSignatures
+      TemplateHaskell
+      OverloadedStrings
+      TupleSections
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wno-unused-top-binds -Wno-unused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       array
     , base >=4.7 && <5
+    , lens
+    , mtl
     , tree-combinatorics-functions
     , unordered-containers
   default-language: Haskell2010

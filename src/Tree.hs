@@ -50,6 +50,9 @@ label :: Tree a -> a
 label (Leaf a) = a
 label (Node a _ _) = a
 
+childrenLabels :: Tree a -> Maybe [a]
+childrenLabels t = (\(x,y) -> [label x, label y]) <$> subtrees t
+
 -- get labels of all nodes in a list
 nodeLabels :: Tree a -> [a]
 nodeLabels (Leaf a) = [a]
@@ -59,6 +62,9 @@ nodeLabels (Node a l r) = nodeLabels l ++ [a] ++ nodeLabels r
 leafLabels :: Tree a -> [a]
 leafLabels (Leaf a) = [a]
 leafLabels (Node _ l r) = leafLabels l ++ leafLabels r
+
+isLeafLabel :: Eq a => Tree a -> a -> Bool
+isLeafLabel t l = l `elem` leafLabels t
 
 -- get labels of all internal nodes
 internalLabels :: Tree a -> [a]
@@ -138,3 +144,8 @@ containsAnyElemFromList :: Eq a => [a] -> [a] -> Bool
 containsAnyElemFromList [] _ = False
 containsAnyElemFromList _ [] = False
 containsAnyElemFromList (x:xs) ys = x `elem` ys || containsAnyElemFromList xs ys
+
+replaceElementAndFlatten :: Eq a => [a] -> a -> [a] -> [a]
+replaceElementAndFlatten [] _ _= []
+replaceElementAndFlatten (z:zs) x xs' | z == x = xs' ++ zs
+                                      | otherwise = z : replaceElementAndFlatten zs x xs'

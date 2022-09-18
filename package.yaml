@@ -23,6 +23,8 @@ dependencies:
 - base >= 4.7 && < 5
 - array
 - unordered-containers
+- lens
+- mtl
 
 ghc-options:
 - -Wall
@@ -39,6 +41,15 @@ ghc-options:
 
 library:
   source-dirs: src
+  default-extensions:
+    - NoMonomorphismRestriction
+    - FlexibleContexts
+    - TypeFamilies
+    - LambdaCase
+    - PartialTypeSignatures
+    - TemplateHaskell
+    - OverloadedStrings
+    - TupleSections
 
 executables:
   tree-combinatorics-functions-exe:
@@ -50,4 +61,13 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - tree-combinatorics-functions
+    default-extensions:
+    - NoMonomorphismRestriction
+    - FlexibleContexts
+    - TypeFamilies
+    - LambdaCase
+    - PartialTypeSignatures
+    - TemplateHaskell
+    - OverloadedStrings
+    - TupleSections
 
