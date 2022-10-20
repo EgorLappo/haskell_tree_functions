@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections #-}
 
-module ACLAttices ( Vertex
+module ACLattices ( Vertex
                   , AC
                   , EdgeList
                   , AdjList
